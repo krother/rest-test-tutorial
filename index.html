@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Song Search</title>
+</head>
+<body>
+	<h1>Search for a Song</h1>
+	<form id="search-form">
+		<label for="song-name">Song Name or ID:</label>
+		<input type="text" id="song-name" name="song-name">
+		<button type="submit">Search</button>
+	</form>
+	<div id="search-results"></div>
+	<script>
+		const searchForm = document.getElementById('search-form');
+		const searchResults = document.getElementById('search-results');
+
+		searchForm.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			const songName = document.getElementById('song-name').value;
+			const apiUrl = `http://localhost:8000/songs/${encodeURIComponent(songName)}`;
+
+			try {
+				const response = await fetch(apiUrl);
+				const song = await response.json();
+				// Process the data and display it on the page
+				console.log(song);
+				searchResults.innerHTML = `<p>Results for ${songName}:</p><ul><li>${song.title} - ${song.artist}</li></ul>`;
+			} catch (error) {
+				searchResults.innerHTML = `<p>An error occurred: ${error.message}</p>`;
+			}
+		});
+	</script>
+</body>
+</html>
