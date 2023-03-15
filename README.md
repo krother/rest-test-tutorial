@@ -73,7 +73,6 @@ You should see some output and a message like:
 
 Write another test against the endpoint `/songs`
 
-    :::python3
     response = client.get('/songs', json={"name": "3"})
 
 ----
@@ -94,7 +93,6 @@ Both are using `pydantic`, a library that will do type checking at runtime for u
 
 Modify the endpoint `/song` so that it uses the entities:
 
-    :::python3
     from song_finder.entity import SongRequest, SongResponse
 
     ...
@@ -108,7 +106,6 @@ Modify the endpoint `/song` so that it uses the entities:
 
 We can add a Unit Test for the entities as well:
 
-    :::python3
     def test_song_response():
         SongResponse(
             song_id=7,
@@ -131,7 +128,6 @@ In [boundary.py](exercises/song_finder/boundary.py) you find a header to which y
 
 Now we can add a test against the new boundary:
 
-    :::python3
     from song_finder.boundary import find_song
     from song_finder.entity import SongRequest, SongResponse
 
@@ -179,7 +175,6 @@ With fixtures in place our test code becomes shorter.
 `pytest` finds and executes all fixtures in `conftest.py` automatically.
 We can now test our boundaries very easily:
 
-    :::python3
     def test_find_song(song_request, song_response):
         assert find_song(song_request) == song_response
 
@@ -197,7 +192,6 @@ Let's start with the boundary function.
 We would expect that we get an `IndexError` if a song can't be found.
 In a test function checking for **Python Exceptions** one would use the `pytest.raises' Context Manager:
 
-    :::python3
     def test_find_song_error():
         with pytest.raises(IndexError):
             request = SongRequest(name="999")
@@ -211,7 +205,6 @@ Often you don't want to expose your internal errors to the API users.
 In that case it makes sense to define an error handler in `app.py`. 
 Here, you can catch errors and replace them by the responses of your choice.
 
-    :::python3
     from fastapi import FastAPI, Request
     from fastapi.responses import JSONResponse
 
@@ -240,7 +233,6 @@ Second, the module `unittest.mock` allows us to sneak our mock database into the
 
 A fully mocked test looks like this:
 
-    :::python3
     from mongomock import MongoClient
     from unittest.mock import patch
 
@@ -275,7 +267,7 @@ We could start a MongoDB in a docker container for local testing:
 The vanilla `MongoClient()` constructor will find a local database without having to configure anything.
 For our tests to run you might want to connect to the database locally and insert the data manually:
 
-    docker exec -it mongodb mongo
+    docker exec -it <containername> mongo
 
     use songdb
     db.songs.insert_many(PASTE songs.json HERE)
