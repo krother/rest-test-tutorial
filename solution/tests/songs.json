@@ -1,0 +1,25 @@
+[
+{
+    "song_id": 1,
+    "title": "Dickes B",
+    "artist": "Seeed"
+},
+{
+    "song_id": 2,
+    "title": "Hej Sokoły",
+    "artist": "Maryla Rodowicz",
+    "year": 1977
+},
+{
+    "song_id": 3,
+    "title": "You are the sunshine of my life",
+    "artist": "Stevie Wonder"
+},
+{
+    "song_id": 4,
+    "title": "Bayraktar (Finnish cover version)",
+    "artist": "Rautaperse",
+    "year": 2022
+
+}
+]
