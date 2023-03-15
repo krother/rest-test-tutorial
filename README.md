@@ -73,6 +73,9 @@ You should see some output and a message like:
 
 Write another test against the endpoint `/songs`
 
+    :::python3
+    response = client.get('/songs', json={"name": "3"})
+
 ----
 
 ## 3. Define Entities
@@ -86,17 +89,26 @@ In the `song_finder/`, we will split the initial app into 3 files:
 * `boundary.py` : contains toplevel functions
 * `control.py` : does the actual work
 
-You find a more detailed explanation of the BCE pattern can be found in Uncle Bobs Clean Code Lectures LINK
-
 In [entity.py](exercises/song_finder/entity.py), we define an Entity for a request and its response.
 Both are using `pydantic`, a library that will do type checking at runtime for us.
 
 Modify the endpoint `/song` so that it uses the entities:
 
+    :::python3
+    from song_finder.entity import SongRequest, SongResponse
+
+    ...
+    @app.get(
+        "/songs",
+        response_model=SongResponse
+    )
     def find_song(query: SongRequest) -> SongResponse:
+        ...
+        return SongResponse(**song)
 
 We can add a Unit Test for the entities as well:
 
+    :::python3
     def test_song_response():
         SongResponse(
             song_id=7,
@@ -119,12 +131,18 @@ In [boundary.py](exercises/song_finder/boundary.py) you find a header to which y
 
 Now we can add a test against the new boundary:
 
-    def test_find_song():
-        song = find_song(42)
+    :::python3
+    from song_finder.boundary import find_song
+    from song_finder.entity import SongRequest, SongResponse
+
+
+    def test_find_song_boundary():
+        request = SongRequest(name=3)
+        song = find_song(request)
         assert type(song) == SongResponse
-        assert song.song_id == 42
-        assert song.author == "Stevie Wonder"
-        assert song.title.startswith("you are the sunshine")
+        assert song.song_id == 3
+        assert song.artist == "Stevie Wonder"
+        assert song.title.startswith("You are the sunshine")
 
 Move all the code from `app.py` that is not absolutely necessary for the API to the boundary.
 
@@ -132,7 +150,7 @@ Move all the code from `app.py` that is not absolutely necessary for the API to 
 
 The API endpoints conceptually also belong to the boundary.
 One could move them to the boundary module.
-However, we don't for now, because this would make `app.py` a lot more complicated.
+However, we don't do that for now, because this would make `app.py` a lot more complicated.
 
 ----
 
@@ -161,6 +179,7 @@ With fixtures in place our test code becomes shorter.
 `pytest` finds and executes all fixtures in `conftest.py` automatically.
 We can now test our boundaries very easily:
 
+    :::python3
     def test_find_song(song_request, song_response):
         assert find_song(song_request) == song_response
 
@@ -178,9 +197,11 @@ Let's start with the boundary function.
 We would expect that we get an `IndexError` if a song can't be found.
 In a test function checking for **Python Exceptions** one would use the `pytest.raises' Context Manager:
 
-    def test_get_song_error(self):
+    :::python3
+    def test_find_song_error():
         with pytest.raises(IndexError):
-            get_song(999)
+            request = SongRequest(name="999")
+            find_song(request)
 
 
 If we want to check for errors in the API, we can simply check the **HTTP status code** of the requests.
@@ -190,6 +211,7 @@ Often you don't want to expose your internal errors to the API users.
 In that case it makes sense to define an error handler in `app.py`. 
 Here, you can catch errors and replace them by the responses of your choice.
 
+    :::python3
     from fastapi import FastAPI, Request
     from fastapi.responses import JSONResponse
 
@@ -197,8 +219,8 @@ Here, you can catch errors and replace them by the responses of your choice.
     def db_error_handler(request: Request, exc: IndexError):
         print("log message", str(exc))
         return JSONResponse(
-            status_code=500,
-            content={"message": f"an error occured but I'm not telling you which one"},
+            status_code=422,
+            content={"message": f"an error occured but I'm not telling you which one. Sorry."},
         )
 
 ----
@@ -218,18 +240,20 @@ Second, the module `unittest.mock` allows us to sneak our mock database into the
 
 A fully mocked test looks like this:
 
+    :::python3
     from mongomock import MongoClient
     from unittest.mock import patch
 
-    def test_mock_db(song_request):
+    def test_mock_db(song_request, songs, mocker:MockerFixture):
         client = MongoClient()
-        client["songdb"].insert_many(songs)
-
-        patch("repository.SongRepository.get_client", return_value=client)
+        client["songdb"].songs.insert_many(songs)
+        
+        mocker.patch("song_finder.repository.get_client", return_value=client)
         song = find_song(song_request)
-        assert song["id"] == 42
+        assert song.song_id == 3
 
-
+Define `songs` as a fixture in `conftest.py`.
+Place a copy of `songs.json` in the tests folder. It is good to store test data there.
 
 An alternative would be to mock the entire `SongRepository` class instead and replace it with something lighter (e.g. SQLite).
 The outcome
@@ -246,7 +270,7 @@ Second, you might want to test the entire product before deploying it.
 
 We could start a MongoDB in a docker container for local testing:
 
-    docker run -d -it -t songdb -p 27017:27017 mongodb
+    docker run -d -it -p 27017:27017 mongo
 
 The vanilla `MongoClient()` constructor will find a local database without having to configure anything.
 For our tests to run you might want to connect to the database locally and insert the data manually:
@@ -347,7 +371,11 @@ You may also use `black` to clean up your code so that it adheres to the PEP8 st
 
 This is a small testing cycle with many parts you would also find in a big software project.
 
+Here are a few recommended links for further reading:
 
+* [fastapi.tiangolo.com/](https://fastapi.tiangolo.com/) – framework for REST APIs
+* [www.fullstackpython.com/](https://www.fullstackpython.com/) – Python friendly technologies for web development
+* [www.youtube.com/watch?v=WpkDN78P884&t=2s](https://www.youtube.com/watch?v=WpkDN78P884) – Uncle Bob explaining the BCE Pattern
 
 ----
 

@@ -1,7 +1,7 @@
 
 from fastapi.testclient import TestClient
 
-from song_finder.app import app
+from app import app
 
 
 def test_hello():

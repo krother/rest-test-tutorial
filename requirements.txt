@@ -5,4 +5,4 @@ mongomock
 playwright
 pytest
 pytest-coverage
-black
+blackpytest-mock
