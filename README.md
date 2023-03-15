@@ -3,6 +3,8 @@
 
 **Organizing test data, fixtures and Mocks in Python**
 
+![laptop generated with deepai.org](title.jpeg)
+
 ## Goal:
 
 In this tutorial, you learn to write tests for a Python REST API powered by a database.
@@ -12,11 +14,13 @@ The tutorial will cover:
 - code structures that make code well-testable
 - organizing test data for use with and without
 - efficient use of fixtures
+- error handling in tests
 - the pros and cons of mocking
 - building a small test database
-- error handling in tests
 
 The tutorial will be rounded off with a few useful tools that make your life easier when testing Python code.
+
+![types of tests](test_types.svg)
 
 ----
 
@@ -40,9 +44,13 @@ To use the code, install the dependencies:
 
     pip install -r requirements.txt
 
-Start the server with:
+Python needs to import the app, so you need to include the main directory of the project in the import path of Python, e.g. on Ubuntu:
 
-    uvicorn app.py:app
+    export PYTHONPATH=$PYTHONPATH:$HOME/projects/rest-testtutorial/exercise
+
+Go to the folder `exercise/` and start the server with:
+
+    uvicorn app:app
 
 Go to [http://localhost:8000/docs](http://localhost:8000/docs).
 You should see that Swagger is up.
@@ -55,11 +63,7 @@ The most important tests in a REST API are tests against the endpoints.
 FastAPI supports a lightweight test client that integrates nicely with `pytest`.
 
 In the folder `tests/` you find a file `test_endpoints.py` containing a test against the enpoint `/hello`.
-The tests need to import the app, so you need to make sure your app directory is in the import path of Python, e.g. on Ubuntu:
-
-    export PYTHONPATH=$PYTHONPATH:$HOME/projects/rest_test_tutorial/exercise
-
-Then, run the tests:
+Run the test by typing:
 
     pytest
 

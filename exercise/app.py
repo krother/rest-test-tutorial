@@ -16,9 +16,10 @@ def hello():
 
 @app.get("/songs/{query}")
 def songs(query: str):
+
     # load song database
     path = os.path.split(__file__)[0]
-    songdb = json.load(open(os.path.join(path, 'songs.json')))
+    songdb = json.load(open(os.path.join(path, 'song_finder', 'songs.json')))
 
     # search song by id or title
     for song in songdb:
