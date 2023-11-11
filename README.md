@@ -3,7 +3,7 @@
 
 **Organizing test data, fixtures and Mocks in Python**
 
-![laptop generated with deepai.org](title.jpeg)
+![laptop with gears, generated with dreamstudio.ai](title.png)
 
 ## Goal:
 
@@ -48,7 +48,7 @@ Python needs to import the app, so you need to include the main directory of the
 
     export PYTHONPATH=$PYTHONPATH:$HOME/projects/rest-testtutorial/exercise
 
-Go to the folder `exercise/` and start the server with:
+Go to the folder `exercise/` or `solution/` and start the server with:
 
     uvicorn app:app
 
