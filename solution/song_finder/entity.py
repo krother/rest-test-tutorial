@@ -1,4 +1,8 @@
+"""
+Entities:
 
+Specify the data model used by the boundaries.
+"""
 from typing import Union
 
 from pydantic import BaseModel

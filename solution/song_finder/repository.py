@@ -1,4 +1,8 @@
+"""
+Repository:
 
+Responsible for the data layer.
+"""
 import pymongo
 
 

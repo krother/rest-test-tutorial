@@ -3,18 +3,22 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from song_finder.entity import SongRequest, SongResponse
-from song_finder.boundary import find_song
+from song_finder.boundary import find_song, SongFinderError
 
 
 app = FastAPI()
 
 
-@app.exception_handler(IndexError)
+@app.exception_handler(SongFinderError)
 def db_error_handler(request: Request, exc: IndexError):
+    """
+    FastAPIs internal error handler allows to connect
+    custom Exceptions to HTTP reponses
+    """
     print("log message", str(exc))
     return JSONResponse(
         status_code=422,
-        content={"message": f"an error occured but I'm not telling you which one. Sorry."},
+        content={"message": f"an error occured: {exc}\n"},
     )
 
 
@@ -23,7 +27,7 @@ def hello():
     return {"Hello": "World"}
 
 
-@app.get(
+@app.post(
     "/songs",
     response_model=SongResponse
     )

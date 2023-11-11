@@ -1,16 +1,25 @@
+"""
+Controller:
+
+Organize processes required to execute an endpoint.
+"""
+import re
 
 from song_finder.entity import SongRequest, SongResponse
 from song_finder.repository import SongRepository
 
-import json
-import os
+
+class SongFinderError(Exception): pass
 
 
 def execute_query(query: SongRequest) -> SongResponse:
     """Finds a song with the given query parameters"""
     repo = SongRepository()
-    if query.name[0] in "1234567890":
+    if re.match(r"^\d+$", query.name):
         result = repo.find_song_by_id(int(query.name))
     else:
         result = repo.find_song_by_name(query.name)
-    return SongResponse(**result)
+    if result:
+        return SongResponse(**result)
+ 
+    raise SongFinderError(f"song {query.name} not found!")

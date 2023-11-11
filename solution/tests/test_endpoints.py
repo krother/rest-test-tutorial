@@ -2,7 +2,6 @@
 from fastapi.testclient import TestClient
 
 from app import app
-from song_finder.entity import SongRequest
 
 
 def test_hello():
@@ -14,7 +13,7 @@ def test_hello():
 
 def test_find():
     client = TestClient(app)
-    response = client.get('/songs', json={"name": "3"})
+    response = client.post('/songs', json={"name": "3"})
     assert response.status_code == 200
     assert response.json() == {
         'song_id': 3,
@@ -26,5 +25,5 @@ def test_find():
 
 def test_find_fail():
     client = TestClient(app)
-    response = client.get('/songs', json={"name": "999"})
+    response = client.post('/songs', json={"name": "999"})
     assert response.status_code == 422

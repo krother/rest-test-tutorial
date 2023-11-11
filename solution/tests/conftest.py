@@ -1,7 +1,9 @@
 import json
 import os
 
+from mongomock import MongoClient
 import pytest
+from pytest_mock import MockerFixture
 
 from song_finder.entity import SongRequest, SongResponse
 
@@ -19,8 +21,18 @@ def song_response():
         artist="Stevie Wonder", 
     )
 
-@pytest.fixture
-def songs():
+def read_songs():
     """some songs for testing"""
     path = os.path.split(__file__)[0]
     return json.load(open(os.path.join(path, 'songs.json')))
+
+
+@pytest.fixture(autouse=True)
+def db_with_songs(mocker:MockerFixture):
+    client = MongoClient()
+    mocker.patch("song_finder.repository.get_client", return_value=client)
+
+    db = client.songdb
+    db.songs.insert_many(read_songs())
+    yield db
+    db.songs.delete_many({})
