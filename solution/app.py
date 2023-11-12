@@ -10,7 +10,7 @@ app = FastAPI()
 
 
 @app.exception_handler(SongFinderError)
-def db_error_handler(request: Request, exc: IndexError):
+def db_error_handler(request: Request, exc: SongFinderError):
     """
     FastAPIs internal error handler allows to connect
     custom Exceptions to HTTP reponses
